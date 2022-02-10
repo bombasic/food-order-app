@@ -10,6 +10,5 @@ const CartIcon = () => {
   );
 };
 
-// test comment
 
 export default CartIcon;
