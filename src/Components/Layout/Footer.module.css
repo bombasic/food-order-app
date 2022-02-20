@@ -1,0 +1,18 @@
+.footer {
+  max-width: 20rem;
+  margin: 2rem auto 2rem auto;
+  text-align: center;
+  animation: footer-appear 1s ease-out forwards;
+}
+
+@keyframes footer-appear {
+  from {
+    opacity: 0;
+    transform: translateY(3rem);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
