@@ -7,12 +7,24 @@ import classes from "./AvailableMeals.module.css";
 const AvailableMeals = () => {
   const [meals, setMeals] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState();
+  const [simulate, setSimulate] = useState(null);
 
-  useEffect(async () => {
+  let firebaseUrl = "https://test-ecce5-default-rtdb.firebaseio.com/meals.json";
+
+  if (simulate) {
+    firebaseUrl = "";
+    console.log("simulate");
+  }
+
+  useEffect(() => {
     const fetchMeals = async () => {
-      const response = await fetch(
-        "https://test-ecce5-default-rtdb.firebaseio.com/meals.json"
-      );
+      const response = await fetch(firebaseUrl);
+
+      if (!response.ok) {
+        throw new Error("Something went wrong");
+      }
+
       const responseData = await response.json();
 
       const loadedMeals = [];
@@ -28,11 +40,20 @@ const AvailableMeals = () => {
       setMeals(loadedMeals);
       setIsLoading(false);
     };
-    fetchMeals();
-  }, []);
+
+    // We can't use try/catch here since this we are getting a promise.
+    // We could use await for fetchmeals but we would have to create it in a seperate function
+    fetchMeals().catch((error) => {
+      setIsLoading(false);
+      setError(error.message);
+    });
+  }, [firebaseUrl]);
 
   if (isLoading) {
     return <section className={classes.MealsLoading}>Loading...</section>;
+  }
+  if (error) {
+    return <section className={classes.MealsError}>{error}</section>;
   }
 
   const mealsList = meals.map((meal) => (
@@ -44,10 +65,27 @@ const AvailableMeals = () => {
       price={meal.price}
     />
   ));
+
+  if (simulate) {
+    firebaseUrl = "";
+    console.log("simulate");
+  }
+
+  const simulateHandler = () => {
+    if (!simulate) {
+      setSimulate(true);
+    }
+    if (simulate) {
+      setSimulate(false);
+    }
+  };
   return (
     <section className={classes.meals}>
       <Card>
         <ul>{mealsList}</ul>
+        <button onClick={simulateHandler} className={classes.button}>
+          Simulate http error
+        </button>
       </Card>
     </section>
   );
